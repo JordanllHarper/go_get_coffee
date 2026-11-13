@@ -16,3 +16,13 @@ func (err errItemNotFound) Error() string {
 func (err errItemNotFound) Status() int {
 	return http.StatusNotFound
 }
+
+type errEmptyOrder struct{}
+
+func (err errEmptyOrder) Error() string {
+	return "empty order"
+}
+
+func (err errEmptyOrder) Status() int {
+	return http.StatusBadRequest
+}

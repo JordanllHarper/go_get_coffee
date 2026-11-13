@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"sync"
+	"time"
 	"uuid"
 )
 
@@ -78,15 +79,25 @@ func NewInMemOrderStore(itemGetter ItemGetter) *inMemOrderStore {
 }
 
 func (os *inMemOrderStore) AddOrder(order ReqOrderCreate) (ResOrderCreate, error) {
-	_, err := os.itemGetter.GetItems(order.ItemIds...)
+	items, err := os.itemGetter.GetItems(order.ItemIds...)
 	if err != nil {
 		return ResOrderCreate{}, fmt.Errorf("error fetching items: %w", err)
 	}
+
 	os.mu.Lock()
 	defer os.mu.Unlock()
+
 	resOrder := ResOrderCreate{
 		OrderId: uuid.New().String(),
 		ItemIds: order.ItemIds,
+		TotalCost: Cost{
+			Amount: aggFunc(items, 0, func(acc int, i ResItemCreate) int {
+				return acc + i.Cost.Amount
+			}),
+			Currency: items[0].Cost.Currency,
+		},
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}
 	os.items = append(os.items, resOrder)
 

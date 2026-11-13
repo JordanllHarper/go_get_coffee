@@ -33,7 +33,7 @@ type (
 	ResOrderCreate struct {
 		OrderId   string    `json:"orderId"`
 		ItemIds   []string  `json:"itemIds"`
-		Cost      int       `json:"cost"`
+		TotalCost Cost      `json:"totalCost"`
 		CreatedAt time.Time `json:"createdAt"`
 		UpdatedAt time.Time `json:"updatedAt"`
 	}

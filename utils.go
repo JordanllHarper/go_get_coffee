@@ -54,6 +54,14 @@ func mapFunc[Src any, Dst any](items []Src, pred func(Src) Dst) []Dst {
 	return dsts
 }
 
+func aggFunc[Src any, Dst any](items []Src, init Dst, pred func(acc Dst, s Src) Dst) Dst {
+	ac := init
+	for _, item := range items {
+		ac = pred(ac, item)
+	}
+	return ac
+}
+
 func getItemsByIds[T idable](ids []string, items []T) ([]T, error) {
 	idItems := make([]T, len(ids))
 	for i, id := range ids {

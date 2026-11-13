@@ -50,6 +50,7 @@ type (
 
 	OrderGetter interface {
 		GetOrders(...string) ([]ResOrderCreate, error)
+		GetOrderById(id string) (ResOrderCreate, error)
 	}
 )
 
