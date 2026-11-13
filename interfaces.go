@@ -7,6 +7,12 @@ type HttpError interface {
 	Status() int
 }
 
+// Idables
+
+type idable interface {
+	Id() string
+}
+
 // Validation
 
 type Validator interface {

@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"strings"
+	"time"
 )
 
 // Item creation
@@ -30,8 +31,11 @@ type (
 	}
 
 	ResOrderCreate struct {
-		OrderId string   `json:"orderId"`
-		ItemIds []string `json:"itemIds"`
+		OrderId   string    `json:"orderId"`
+		ItemIds   []string  `json:"itemIds"`
+		Cost      int       `json:"cost"`
+		CreatedAt time.Time `json:"createdAt"`
+		UpdatedAt time.Time `json:"updatedAt"`
 	}
 )
 

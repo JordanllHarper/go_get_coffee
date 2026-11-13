@@ -13,7 +13,7 @@ func setupV1Endpoints(mux *http.ServeMux, d dependencies, srv string) {
 
 	mux.HandleFunc("POST /v1/orders", handlePostOrders(d, srv))
 	mux.HandleFunc("GET /v1/orders", handleGetOrders(d))
-
+	mux.HandleFunc("GET /v1/orders/{id}", handleGetOrderById(d))
 }
 
 func handleGetItems(d ItemGetter) http.HandlerFunc {
@@ -34,15 +34,7 @@ func handleGetItems(d ItemGetter) http.HandlerFunc {
 
 func handleGetItemById(d ItemGetter) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		id := r.PathValue("id")
-		items, err := d.GetItemById(id)
-		if err != nil {
-			handleError(w, err)
-			return
-		}
-		if err := jsonEncode(w, http.StatusOK, items); err != nil {
-			log.Println("Error sending items", err)
-		}
+		getResourceById(w, r, d.GetItemById)
 	}
 }
 
@@ -102,6 +94,12 @@ func handleGetOrders(d OrderGetter) http.HandlerFunc {
 	}
 }
 
+func handleGetOrderById(d OrderGetter) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		getResourceById(w, r, d.GetOrderById)
+	}
+}
+
 func validate(w http.ResponseWriter, v Validator) (ok bool) {
 	errs := v.Validate()
 	if len(errs) == 0 {
@@ -116,4 +114,16 @@ func validate(w http.ResponseWriter, v Validator) (ok bool) {
 		log.Println("Error encoding errors:", err)
 	}
 	return false
+}
+
+func getResourceById[T any](w http.ResponseWriter, r *http.Request, getResource func(id string) (T, error)) {
+	id := r.PathValue("id")
+	resource, err := getResource(id)
+	if err != nil {
+		handleError(w, err)
+		return
+	}
+	if err := jsonEncode(w, http.StatusOK, resource); err != nil {
+		log.Println("Error sending items", err)
+	}
 }

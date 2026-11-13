@@ -54,10 +54,6 @@ func mapFunc[Src any, Dst any](items []Src, pred func(Src) Dst) []Dst {
 	return dsts
 }
 
-type idable interface {
-	Id() string
-}
-
 func getItemsByIds[T idable](ids []string, items []T) ([]T, error) {
 	idItems := make([]T, len(ids))
 	for i, id := range ids {

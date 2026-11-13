@@ -60,15 +60,7 @@ func (is *inMemItemStore) GetItemById(id string) (ResItemCreate, error) {
 	is.mu.RLock()
 	defer is.mu.RUnlock()
 
-	v, ok := findFunc(is.items, func(i ResItemCreate) bool {
-		return i.ItemId == id
-	})
-
-	if !ok {
-		return ResItemCreate{}, errItemNotFound{id: id}
-	}
-
-	return v, nil
+	return getById(is.items, id)
 }
 
 type inMemOrderStore struct {
@@ -112,4 +104,24 @@ func (os *inMemOrderStore) GetOrders(ids ...string) ([]ResOrderCreate, error) {
 		return nil, fmt.Errorf("error fetching order by ids: %w", err)
 	}
 	return items, nil
+}
+
+func (os *inMemOrderStore) GetOrderById(id string) (ResOrderCreate, error) {
+	os.mu.RLock()
+	defer os.mu.RUnlock()
+
+	return getById(os.items, id)
+}
+
+func getById[T idable](items []T, id string) (T, error) {
+	var t T
+	v, ok := findFunc(items, func(i T) bool {
+		return i.Id() == id
+	})
+
+	if !ok {
+		return t, errItemNotFound{id: id}
+	}
+
+	return v, nil
 }
