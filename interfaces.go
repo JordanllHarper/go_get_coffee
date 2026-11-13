@@ -53,6 +53,8 @@ type (
 	}
 )
 
+// Backup
+
 type ResourceBackup[T any] interface {
 	Backup(items []T)
 	Fetch() ([]T, error)
