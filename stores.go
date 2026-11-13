@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"strings"
 	"sync"
 	"time"
 	"uuid"
@@ -26,15 +27,22 @@ func NewInMemItemStore(b ResourceBackup[ResItemCreate]) *inMemItemStore {
 }
 
 func (is *inMemItemStore) AddItem(item ReqItemCreate) (ResItemCreate, error) {
+	is.mu.Lock()
+	defer is.mu.Unlock()
+	_, found := findFunc(is.items, func(i ResItemCreate) bool {
+		return strings.TrimSpace(i.Name) == strings.TrimSpace(item.Name)
+	})
+
+	if found {
+		return ResItemCreate{}, errAlreadyExists{"Name", item.Name}
+	}
+
 	resItem := ResItemCreate{
 		ItemId:      uuid.New().String(),
 		Name:        item.Name,
 		Description: item.Description,
 		Cost:        item.Cost,
 	}
-
-	is.mu.Lock()
-	defer is.mu.Unlock()
 
 	is.items = append(is.items, resItem)
 

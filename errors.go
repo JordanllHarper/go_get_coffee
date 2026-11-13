@@ -17,12 +17,15 @@ func (err errItemNotFound) Status() int {
 	return http.StatusNotFound
 }
 
-type errEmptyOrder struct{}
-
-func (err errEmptyOrder) Error() string {
-	return "empty order"
+type errAlreadyExists struct {
+	property string
+	value    string
 }
 
-func (err errEmptyOrder) Status() int {
-	return http.StatusBadRequest
+func (err errAlreadyExists) Error() string {
+	return fmt.Sprintf("resource with %s property of %s value already exists", err.property, err.value)
+}
+
+func (err errAlreadyExists) Status() int {
+	return http.StatusConflict
 }
