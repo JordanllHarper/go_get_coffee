@@ -38,12 +38,21 @@ func sendStatusCreated(w http.ResponseWriter, location string, v any) error {
 
 func findFunc[T any](items []T, pred func(T) bool) (T, bool) {
 	var t T
-	for _, item := range items {
+	idx := findIndexFunc(items, pred)
+	if idx == -1 {
+		return t, false
+	}
+
+	return items[idx], true
+}
+
+func findIndexFunc[T any](items []T, pred func(T) bool) int {
+	for i, item := range items {
 		if pred(item) {
-			return item, true
+			return i
 		}
 	}
-	return t, false
+	return -1
 }
 
 func mapFunc[Src any, Dst any](items []Src, pred func(Src) Dst) []Dst {

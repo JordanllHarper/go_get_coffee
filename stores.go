@@ -106,6 +106,7 @@ func (os *inMemOrderStore) AddOrder(order ReqOrderCreate) (ResOrderCreate, error
 		},
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
+		Status:    StatusInProgress,
 	}
 	os.items = append(os.items, resOrder)
 
@@ -130,6 +131,22 @@ func (os *inMemOrderStore) GetOrderById(id string) (ResOrderCreate, error) {
 	defer os.mu.RUnlock()
 
 	return getById(os.items, id)
+}
+
+func (os *inMemOrderStore) CompleteOrder(id string) (ResOrderCreate, error) {
+	os.mu.Lock()
+	defer os.mu.Unlock()
+
+	idx := findIndexFunc(os.items, func(item ResOrderCreate) bool {
+		return item.Id() == id
+	})
+
+	if idx == -1 {
+		return ResOrderCreate{}, errItemNotFound{id: id}
+	}
+
+	os.items[idx].Status = StatusCompleted
+	return os.items[idx], nil
 }
 
 func getById[T idable](items []T, id string) (T, error) {

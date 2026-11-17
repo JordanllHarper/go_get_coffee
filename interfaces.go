@@ -42,6 +42,7 @@ type (
 	OrderStore interface {
 		OrderAdder
 		OrderGetter
+		OrderCompleter
 	}
 
 	OrderAdder interface {
@@ -51,6 +52,10 @@ type (
 	OrderGetter interface {
 		GetOrders(...string) ([]ResOrderCreate, error)
 		GetOrderById(id string) (ResOrderCreate, error)
+	}
+
+	OrderCompleter interface {
+		CompleteOrder(id string) (ResOrderCreate, error)
 	}
 )
 

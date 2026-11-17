@@ -36,6 +36,7 @@ type (
 		TotalCost Cost      `json:"totalCost"`
 		CreatedAt time.Time `json:"createdAt"`
 		UpdatedAt time.Time `json:"updatedAt"`
+		Status    Status    `json:"status"`
 	}
 )
 
@@ -48,6 +49,15 @@ type (
 		// cost in lowest form of currency
 		Amount int `json:"amount"`
 	}
+)
+
+// Order status
+
+type Status string
+
+const (
+	StatusInProgress Status = "inProgress"
+	StatusCompleted  Status = "completed"
 )
 
 // Validation

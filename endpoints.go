@@ -14,6 +14,8 @@ func setupV1Endpoints(mux *http.ServeMux, d dependencies, srv string) {
 	mux.HandleFunc("POST /v1/orders", handlePostOrders(d, srv))
 	mux.HandleFunc("GET /v1/orders", handleGetOrders(d))
 	mux.HandleFunc("GET /v1/orders/{id}", handleGetOrderById(d))
+
+	mux.HandleFunc("PUT /v1/orders/{id}/status", handlePutOrdersStatus(d))
 }
 
 func handleGetItems(d ItemGetter) http.HandlerFunc {
@@ -97,6 +99,21 @@ func handleGetOrders(d OrderGetter) http.HandlerFunc {
 func handleGetOrderById(d OrderGetter) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		getResourceById(w, r, d.GetOrderById)
+	}
+}
+
+func handlePutOrdersStatus(c OrderCompleter) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		id := r.PathValue("id")
+		completedOrder, err := c.CompleteOrder(id)
+		if err != nil {
+			handleError(w, err)
+			return
+		}
+
+		if err := jsonEncode(w, http.StatusOK, completedOrder); err != nil {
+			log.Println("Error sending completed item:", err)
+		}
 	}
 }
 
